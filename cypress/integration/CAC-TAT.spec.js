@@ -10,13 +10,13 @@ describe('Central de Atendimento ao Cliente TAT', function() {
 
     it('preenche os campos obrigatórios e envia formulário', function(){
 
-      const longText ='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+      const longText ='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor in.'
 
         cy.get('#firstName').type('Priscila')
         cy.get('#lastName').type('Alves França')
         cy.get('#email').type('priscila@gmail.com')
         cy.get('#open-text-area').type(longText,{delay:0})
-        cy.get('button[type="submit"]').click()
+        cy.contains('button', 'Enviar').click()
 
         cy.get('.success').should('be.visible')
       })
@@ -24,29 +24,67 @@ describe('Central de Atendimento ao Cliente TAT', function() {
     it('exibe mensagem de erro ao submeter o formulário com um email com formatação inválida', function(){
        cy.get('#firstName').type('Priscila')
        cy.get('#lastName').type('Alves França')
-       cy.get('#email').type('priscila@gmail.com')
+       cy.get('#email').type('priscila@gmail!com')
        cy.get('#open-text-area').type('Teste')
-       cy.get('button[type="submit"]').click()
+       cy.contains('button', 'Enviar').click()
 
        cy.get('.error').should('be.visible')
       })
 
-      it.only('campo telefone continua vazio quando preenchido com valor não-numérico', function(){
+      it('campo telefone continua vazio quando preenchido com valor não-numérico', function(){
         cy.get('#phone')
-          .type('abcdefghij')
+          .type('abcdef')
           .should('have.value','')
 
       })
 
-      //it.only('exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulário', function(){
-      //  cy.get('#firstName').type('Priscila')
-       // cy.get('#lastName').type('Alves França')
-        //cy.get('#telefone').type('11987204365')
-        //cy.get('#email').type('priscila@gmail!com')
-        //cy.get('#open-text-area').type('Teste')
-        //cy.get('button[type="submit"]').click()
+      it('exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulário', function(){
+        cy.get('#firstName').type('Priscila')
+        cy.get('#lastName').type('Alves França')
+        cy.get('#email').type('priscila@gmail.com')
+        cy.get('#phone-checkbox').click()
+        cy.get('#open-text-area').type('Teste')
+        cy.contains('button', 'Enviar').click()
  
-        //cy.get('.error').should('be.visible')
-       //})
+        cy.get('.error').should('be.visible')
+       })
+
+      it('preenche e limpa os campos nome, sobrenome, email e telefone', function(){
+        cy.get('#firstName')
+          .type('Priscila')
+          .should('have.value', 'Priscila')
+          .clear()
+          .should('have.value', '')
+        cy.get('#lastName')
+          .type('Alves')
+          .should('have.value', 'Alves')
+          .clear()
+          .should('have.value', '')
+        cy.get('#email')
+          .type('priscila@gmail.com')
+          .should('have.value', 'priscila@gmail.com')
+          .clear()
+          .should('have.value', '')
+        cy.get('#phone')
+          .type('123456789')
+          .should('have.value','123456789')
+          .clear()
+          .should('have.value','')
+      }) 
+
+      it('exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', function(){
+        cy.get('button[type="submit"]').click()
+
+        cy.get('.error').should('be.visible')
+      })
+    
+    
+      it('envia o formuário com sucesso usando um comando customizado', function (){
+        cy.fillMandatoryFieldsAndSubmit()
+
+        cy.get('.success').should('be.visible')
+      })
+    
+
     })
   
